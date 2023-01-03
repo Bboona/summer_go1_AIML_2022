@@ -1,2 +1,0 @@
-greenball_tracking
--DCATKIN_DEVEL_PREFIX=/home/unitree/summer_project/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/unitree/summer_project/catkin_ws/install -G Unix Makefiles
