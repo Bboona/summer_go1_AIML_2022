@@ -4,16 +4,9 @@
 #include <cerrno>
 #include <cfenv>
 #include <ros/ros.h>
-
 #include <sensor_msgs/Range.h>
-
-
-
 #include <UnitreeCameraSDK.hpp>
 #include <unitree_legged_sdk/unitree_legged_sdk.h>
-
-
-
 #include <unistd.h>
 #include <iostream>
 #include <deque>

@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 from multiprocessing import Process, Pipe
 # import os
 import sys
-sys.path.append('/home/unitree/summer_project/programming/build') # Edit the path to "build" folder on your computer
+sys.path.append('/home/unitree/summer_project/mqtt_programming/build') # Edit the path to "build" folder on your computer
 import robot_interface_high_level as robot_interface
 
 class Unitree_Robot():

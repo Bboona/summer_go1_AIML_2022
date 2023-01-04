@@ -48,4 +48,11 @@ target_link_libraries(greenball_tracking
     ${SDKLIBS}
 )
 
+add_executable(joystick_node src/joystick_node.cc)
+target_link_libraries(joystick_node
+    ${catkin_LIBRARIES}
+    ${SDKLIBS}
+)
+
+
 
