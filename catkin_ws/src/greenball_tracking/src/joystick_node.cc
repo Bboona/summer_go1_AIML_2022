@@ -5,6 +5,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 
 #include <unitree_legged_sdk/unitree_legged_sdk.h>
 #include <unitree_legged_sdk/joystick.h>
+#include <PahoMQTT.hpp>
 #include <math.h>
 #include <iostream>
 #include <unistd.h>
@@ -17,8 +18,10 @@ class Joystick
 public:
     Joystick(uint8_t level): 
         safe(LeggedType::Go1), 
-        udp(level, 8090, "192.168.123.161", 8082){
+        udp(level, 8090, "192.168.123.161", 8082),
+        mqtt("tcp://192.168.123.161:1883", "mqtt_client"){
         udp.InitCmdData(cmd);
+        mqtt.connect();
     }
     void UDPSend();
     void UDPRecv();
@@ -31,6 +34,7 @@ public:
     xRockerBtnDataStruct _keyData;
     int motiontime = 0;
     float dt = 0.002;     // 0.001~0.01
+    PahoMQTT mqtt;
 };
 
 void Joystick::UDPRecv()
@@ -52,71 +56,23 @@ void Joystick::RobotControl()
 
     if((int)_keyData.btn.components.down == 1){
         std::cout << "The key down is pressed"<< std::endl;
-        std::cout << "Running MQTT command"<< std::endl;
-        int child_pid = fork();
-        if (child_pid == 0) {
-            // This is the child process, so run the second package
-            execlp("python3", "python3", "../change_LED_red_mqtt.py", NULL);
-            // If execlp returns, it has failed
-            std::cerr << "Failed to start second package!" << std::endl;
-            exit(1);
-        }
-
-        // Wait for the user to press enter, then kill the second package
-        std::cout << "Press enter to terminate second package..." << std::endl;
-        std::cin.get();
-        kill(child_pid, SIGKILL);
+        std::cout << "Changing face LED color"<< std::endl;
+        mqtt.setColor(0, 0, 255);
     }
     if((int)_keyData.btn.components.right == 1){
         std::cout << "The key right is pressed"<< std::endl;
-        std::cout << "Running MQTT command"<< std::endl;
-        int child_pid = fork();
-        if (child_pid == 0) {
-            // This is the child process, so run the second package
-            execlp("python3", "python3", "../change_LED_blue_mqtt.py", NULL);
-            // If execlp returns, it has failed
-            std::cerr << "Failed to start second package!" << std::endl;
-            exit(1);
-        }
-
-        // Wait for the user to press enter, then kill the second package
-        std::cout << "Press enter to terminate second package..." << std::endl;
-        std::cin.get();
-        kill(child_pid, SIGKILL);
+        std::cout << "Changing face LED color"<< std::endl;
+        mqtt.setColor(0, 255, 0);
     } 
     if((int)_keyData.btn.components.left == 1){
         std::cout << "The key left is pressed"<< std::endl;
-        std::cout << "Running MQTT command"<< std::endl;
-        int child_pid = fork();
-        if (child_pid == 0) {
-            // This is the child process, so run the second package
-            execlp("python3", "python3", "../change_LED_green_mqtt.py", NULL);
-            // If execlp returns, it has failed
-            std::cerr << "Failed to start second package!" << std::endl;
-            exit(1);
-        }
-
-        // Wait for the user to press enter, then kill the second package
-        std::cout << "Press enter to terminate second package..." << std::endl;
-        std::cin.get();
-        kill(child_pid, SIGKILL);
+        std::cout << "Changing face LED color"<< std::endl;
+        mqtt.setColor(255, 0, 0);
     }
     if((int)_keyData.btn.components.up == 1){
         std::cout << "The key up is pressed"<< std::endl;
-        std::cout << "Running MQTT command"<< std::endl;
-        int child_pid = fork();
-        if (child_pid == 0) {
-            // This is the child process, so run the second package
-            execlp("python3", "python3", "../turnoff_LED_mqtt.py", NULL);
-            // If execlp returns, it has failed
-            std::cerr << "Failed to start second package!" << std::endl;
-            exit(1);
-        }
-
-        // Wait for the user to press enter, then kill the second package
-        std::cout << "Press enter to terminate second package..." << std::endl;
-        std::cin.get();
-        kill(child_pid, SIGKILL);
+        std::cout << "Turning off face LED color"<< std::endl;
+        mqtt.setColor(0, 0, 0);
     } 
 
     udp.SetSend(cmd);

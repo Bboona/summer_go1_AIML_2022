@@ -28,7 +28,7 @@ else()
     message(FATAL_ERROR "OpenCV Library Not Found")
 endif()
 
-set(SDKLIBS unitree_camera tstc_V4L2_xu_camera udev systemlog unitree_legged_sdk ${OpenCV_LIBS})
+set(SDKLIBS paho-mqttpp3 paho-mqtt3as unitree_camera tstc_V4L2_xu_camera udev systemlog unitree_legged_sdk ${OpenCV_LIBS})
 
 if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
 link_directories(${PROJECT_SOURCE_DIR}/lib/amd64/)
