@@ -10,8 +10,13 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include <iostream>
 #include <unistd.h>
 #include <signal.h>
+#include <cstdlib>
+#include <ros/ros.h>
+#include <ros/node_handle.h>
 
 using namespace UNITREE_LEGGED_SDK;
+
+bool running = false;
 
 class Joystick
 {
@@ -54,36 +59,30 @@ void Joystick::RobotControl()
 
     memcpy(&_keyData, &state.wirelessRemote[0], 40);
 
-    if((int)_keyData.btn.components.down == 1){
-        std::cout << "The key down is pressed"<< std::endl;
-        std::cout << "Changing face LED color"<< std::endl;
-        mqtt.setColor(0, 0, 255);
+    if((int)_keyData.btn.components.L2 == 1 && (int)_keyData.btn.components.R2 == 1){
+        std::cout << "Starting green_ball_tracking Node..."<< std::endl;
+        // Run the greenball_tracking ROS node using the system() function
+        if (!running){
+            running = true;
+            pid = system("rosrun greenball_tracking greenball_tracking 1 &");
+            mqtt.setColor(0, 0, 255);
+        }
+        
     }
-    if((int)_keyData.btn.components.right == 1){
-        std::cout << "The key right is pressed"<< std::endl;
-        std::cout << "Changing face LED color"<< std::endl;
-        mqtt.setColor(0, 255, 0);
-    } 
-    if((int)_keyData.btn.components.left == 1){
-        std::cout << "The key left is pressed"<< std::endl;
-        std::cout << "Changing face LED color"<< std::endl;
-        mqtt.setColor(255, 0, 0);
-    }
-    if((int)_keyData.btn.components.up == 1){
-        std::cout << "The key up is pressed"<< std::endl;
-        std::cout << "Turning off face LED color"<< std::endl;
+    if((int)_keyData.btn.components.L2 == 1 && (int)_keyData.btn.components.L1 == 1 && running){
+        std::cout << "Stopping green_ball_tracking Node..."<< std::endl;
         mqtt.setColor(0, 0, 0);
-    } 
+        // Run the greenball_tracking ROS node using the system() function
+        cout<<pid<<endl;
+        kill(pid, SIGTERM);
+        running = false;
+    }
 
     udp.SetSend(cmd);
 }
 
 int main(void)
 {
-    std::cout << "Communication level is set to HIGH-level." << std::endl
-              << "WARNING: Make sure the robot is standing on the ground." << std::endl
-              << "Press Enter to continue..." << std::endl;
-    std::cin.ignore();
 
     Joystick custom(HIGHLEVEL);
     // InitEnvironment();
