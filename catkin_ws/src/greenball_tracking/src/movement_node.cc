@@ -4,53 +4,41 @@
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 #include "convert.h"
 #include <PahoMQTT.hpp>
+#include "geometry_msgs/Point.h"
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
 
 using namespace UNITREE_LEGGED_SDK;
 
+// callback function for the subscriber
+void ballCoordinatesCallback(const boost::shared_ptr<const geometry_msgs::Point>& msg, ros::Publisher pub)
+{
+  // print the x coordinate of the point
+  ROS_INFO("x = %f", msg->x);
+
+  // publish the received point
+  pub.publish(*msg);
+}
+
 int main(int argc, char **argv)
 {
-    ros::NodeHandle nh;
+  // initialize the ROS system and become a node
+  ros::init(argc, argv, "ball_coordinates_reader");
+  ros::NodeHandle nh;
 
-    ros::Rate loop_rate(500);
+  // create a publisher to the "/gotem" topic
+  ros::Publisher pub = nh.advertise<geometry_msgs::Point>("/gotem", 10);
 
-    long motiontime = 0;
+  // create a boost function object that calls the ballCoordinatesCallback function with the right arguments
+  boost::function<void(const boost::shared_ptr<const geometry_msgs::Point>&)> f =
+      boost::bind(ballCoordinatesCallback, _1, pub);
 
-    unitree_legged_msgs::HighCmd high_cmd_ros;
+  // create a subscriber to the "/ball_coordinates" topic
+  ros::Subscriber sub = nh.subscribe("/ball_coordinates", 10, f);
 
-    ros::Publisher pub = nh.advertise<unitree_legged_msgs::HighCmd>("high_cmd", 1000);
+  // enter a loop to process ROS callbacks
+  ros::spin();
 
-    while (ros::ok())
-    {
-
-        motiontime += 2;
-
-        high_cmd_ros.head[0] = 0xFE;
-        high_cmd_ros.head[1] = 0xEF;
-        high_cmd_ros.levelFlag = HIGHLEVEL;
-        high_cmd_ros.mode = 0;
-        high_cmd_ros.gaitType = 0;
-        high_cmd_ros.speedLevel = 0;
-        high_cmd_ros.footRaiseHeight = 0;
-        high_cmd_ros.bodyHeight = 0;
-        high_cmd_ros.euler[0] = 0;
-        high_cmd_ros.euler[1] = 0;
-        high_cmd_ros.euler[2] = 0;
-        high_cmd_ros.velocity[0] = 0.0f;
-        high_cmd_ros.velocity[1] = 0.0f;
-        high_cmd_ros.yawSpeed = 0.0f;
-        high_cmd_ros.reserve = 0;
-
-        if (motiontime > 0 && motiontime < 1000)
-        {
-            high_cmd_ros.mode = 1;
-            high_cmd_ros.euler[0] = -0.3;
-        }
-
-        pub.publish(high_cmd_ros);
-
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
-
-    return 0;
+  return 0;
 }

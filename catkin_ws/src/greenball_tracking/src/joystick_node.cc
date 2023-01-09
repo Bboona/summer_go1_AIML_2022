@@ -12,10 +12,14 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include <signal.h>
 #include <cstdlib>
 
+
+#define MAX_NODES 2
+
 using namespace UNITREE_LEGGED_SDK;
 
 bool running = false;
-int pid = 0;  // Initialize the child process ID to 0
+
+int pids[MAX_NODES];
 
 class GreenBall
 {
@@ -61,15 +65,36 @@ void GreenBall::Joystick()
         std::cout << "Starting green_ball_tracking Node..."<< std::endl;
         running = true;
         mqtt.setColor(0, 0, 255);
-        pid = fork();
 
-        if (pid == 0) {
+        // Create a new process for the greenball_tracking node
+        pids[0] = fork();
+
+        if (pids[0] == 0) {
             // This is the child process
             execl("/usr/bin/nohup", "/usr/bin/nohup", "rosrun", "greenball_tracking", "greenball_tracking", "1", (char*)NULL);
             exit(EXIT_SUCCESS);
-        } else if (pid > 0) {
+        } else if (pids[0] > 0) {
             // This is the parent process
-            std::cout << "Child process created with PID " << pid << std::endl;
+            std::cout << "Child process created with PID " << pids[0] << std::endl;
+        } else {
+            // fork() failed
+            std::cerr << "fork() failed" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for the Camera
+        sleep(2);
+        
+        // Run the second node using the same approach
+        pids[1] = fork();
+
+        if (pids[1] == 0) {
+            // This is the child process
+            execl("/usr/bin/nohup", "/usr/bin/nohup", "rosrun", "greenball_tracking", "movement_node", (char*)NULL);
+            exit(EXIT_SUCCESS);
+        } else if (pids[1] > 0) {
+            // This is the parent process
+            std::cout << "Child process created with PID " << pids[1] << std::endl;
         } else {
             // fork() failed
             std::cerr << "fork() failed" << std::endl;
@@ -79,7 +104,11 @@ void GreenBall::Joystick()
     if((int)_keyData.btn.components.L2 == 1 && (int)_keyData.btn.components.L1 == 1 && running){
         std::cout << "Stopping green_ball_tracking Node..."<< std::endl;
         mqtt.setColor(0, 0, 0);
-        kill(pid, SIGTERM);
+
+        for (int i = 0; i < 2; i++) {
+            kill(pids[i], SIGTERM);
+        }
+
         running = false;
     }
 }
