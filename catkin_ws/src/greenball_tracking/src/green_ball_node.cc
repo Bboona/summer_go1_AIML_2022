@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
     ros::Rate rate(10);
     
     usleep(500000);
-    while(cam.isOpened()){
+    while(cam.isOpened() && ros::ok()){
         cv::Mat left,right,feim;
         if(!cam.getRectStereoFrame(left,right,feim)){ ///< get longlat rectify left,right and fisheye rectify feim  
             usleep(1000);
@@ -125,6 +125,13 @@ int main(int argc, char *argv[]){
 
                 // Publish the point message
                 point_pub.publish(point);
+
+                ////////////////////////////////////////////////////
+
+                ////// CAN PUBSLISH MORE INFORMATION HERE //////////
+                
+                ////////////////////////////////////////////////////
+
 
                 // Sleep for the desired rate
                 rate.sleep();

@@ -4,13 +4,11 @@ project(greenball_tracking)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 find_package(catkin REQUIRED COMPONENTS
-  #  image_transport
-  #  cv_bridge
   roscpp
   rospy
   std_msgs  
   message_generation
-  #  camera_info_manager
+  geometry_msgs
 )
 
 catkin_package(
@@ -50,6 +48,12 @@ target_link_libraries(greenball_tracking
 
 add_executable(joystick_node src/joystick_node.cc)
 target_link_libraries(joystick_node
+    ${catkin_LIBRARIES}
+    ${SDKLIBS}
+)
+
+add_executable(movement_node src/movement_node.cc)
+target_link_libraries(movement_node
     ${catkin_LIBRARIES}
     ${SDKLIBS}
 )
