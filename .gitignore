@@ -2,3 +2,4 @@ catkin_ws/build
 catkin_ws/devel
 catkin_ws/calib.*
 catkin_ws/nohup.out
+catkin_ws/install

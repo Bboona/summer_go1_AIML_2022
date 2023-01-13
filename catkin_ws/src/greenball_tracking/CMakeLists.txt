@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs  
   message_generation
   geometry_msgs
+  unitree_legged_msgs
 )
 
 catkin_package(
@@ -46,14 +47,20 @@ target_link_libraries(greenball_tracking
     ${SDKLIBS}
 )
 
-add_executable(joystick_node src/joystick_node.cc)
-target_link_libraries(joystick_node
+add_executable(movement_node src/movement_node.cc)
+target_link_libraries(movement_node
     ${catkin_LIBRARIES}
     ${SDKLIBS}
 )
 
-add_executable(movement_node src/movement_node.cc)
-target_link_libraries(movement_node
+add_executable(ros_udp src/ros_udp.cpp)
+target_link_libraries(ros_udp
+    ${catkin_LIBRARIES}
+    ${SDKLIBS}
+)
+
+add_executable(joystick_sub src/joystick_sub.cpp)
+target_link_libraries(joystick_sub
     ${catkin_LIBRARIES}
     ${SDKLIBS}
 )
