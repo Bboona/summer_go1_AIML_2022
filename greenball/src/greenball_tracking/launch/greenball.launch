@@ -1,0 +1,24 @@
+<launch>
+
+    <!-- Set default parameters -->
+    <rosparam param="/start_detection">false</rosparam>
+    <rosparam param="/start_BT">false</rosparam>
+
+    <!-- Launch ball_detector node -->
+    <node pkg="greenball_tracking" type="ball_detector" name="ball_detector_node"  output="screen">
+        <param name="device_node" value="1"/>
+        <param name="frame_width" value="1856"/>
+        <param name="frame_height" value="800"/>
+        <param name="fps" value="30"/>
+        <param name="start_detection" value="false"/>
+    </node>
+
+    <!-- Launch joystick_sub node -->
+    <node pkg="greenball_tracking" type="joystick_sub" name="joystick_sub_node" output="screen"/>
+
+    <!-- Launch behavior_tree node -->
+    <node pkg="greenball_tracking" type="behavior_tree" name="behavior_tree_node"   output="screen">
+        <param name="start_BT" value="false"/>
+    </node>
+
+</launch>

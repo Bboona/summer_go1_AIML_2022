@@ -1,0 +1,2 @@
+greenball_tracking:unitree_legged_msgs
+-DCATKIN_DEVEL_PREFIX=/home/unitree/Unitree/autostart/greenball/devel -DCMAKE_INSTALL_PREFIX=/home/unitree/Unitree/autostart/greenball/install -G Unix Makefiles

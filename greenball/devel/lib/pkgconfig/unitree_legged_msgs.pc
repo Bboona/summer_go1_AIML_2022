@@ -1,0 +1,8 @@
+prefix=/home/unitree/Unitree/autostart/greenball/devel
+
+Name: unitree_legged_msgs
+Description: Description of unitree_legged_msgs
+Version: 0.0.0
+Cflags: -I/home/unitree/Unitree/autostart/greenball/devel/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime std_msgs geometry_msgs sensor_msgs
